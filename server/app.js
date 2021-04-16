@@ -3,38 +3,36 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const Students = require("./models/students");
-const { PostSchema } = require("./models/course");
+const Course = require("./models/course");
 
 const app = express();
-const Courses = mongoose.model("course", PostSchema);
+
 app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
   const { method, url } = req;
   console.log("Middleware running now!");
-  console.log(`${method} ${url} of db "exercise"`);
+  console.log(`${method} for the path "${url}" of db "exercise"`);
   next();
 });
 
 app.get("/course", (req, res) => {
-  Courses.findOne({}, (error, data) => {
-    res.json(data);
-  });
-  // .then((data) => {
-  //   res.json(data);
-  //   res.status(200);
-  //   console.log(data);
-  // })
-  // .catch((error) => {
-  //   res.status(500);
-  //   res.json({ error: `Internal Server Error ${error}` });
-  // });
+  Course.find()
+    .then((course) => {
+      res.json(course);
+      res.status(200);
+      console.log(course);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.json({ error: `Internal Server Error ${error}` });
+    });
 });
 
 app.get("/course/:courseId", (req, res) => {
   const { courseId } = req.params;
 
-  Courses.findById(courseId)
+  Course.findById(courseId)
     .then((post) => {
       res.status(200);
       res.json(post);
@@ -48,7 +46,7 @@ app.get("/course/:courseId", (req, res) => {
 });
 
 app.get("/course/:id/students", (req, res) => {
-  Courses.findById(req.params.id)
+  Course.findById(req.params.id)
     .then((post) => {
       res.status(200);
       res.json(post);
@@ -62,7 +60,7 @@ app.get("/course/:id/students", (req, res) => {
 });
 
 app.get("/course/:id/students/:id", (req, res) => {
-  Courses.findById(req.params.id)
+  Course.findById(req.params.id)
     .then((post) => {
       res.status(200);
       res.json(post);
@@ -77,9 +75,9 @@ app.get("/course/:id/students/:id", (req, res) => {
 
 app.get("/students", (req, res) => {
   Students.find()
-    .then((data) => {
+    .then((course) => {
       res.status(200);
-      res.json(data);
+      res.json(course);
     })
     .catch((error) => {
       res.status(500);
@@ -87,7 +85,43 @@ app.get("/students", (req, res) => {
     });
 });
 
-mongoose.connect("mongodb://localhost:27017/exercise", {
+app.post("/course", (req, res) => {
+  Course.create({
+    name: req.body.name,
+    type: req.body.type,
+    location: req.body.location,
+  })
+    .then((course) => {
+      res.status(201);
+      res.status(course);
+      console.log(course);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.json(error);
+    });
+});
+
+app.post("/students", (req, res) => {
+  const { courseId } = req.params;
+  Students.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    location: req.body.location,
+    course: req.body.course,
+  })
+    .then((student) => {
+      res.status(201);
+      res.status(student);
+      console.log(student);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.json(error);
+    });
+});
+
+mongoose.connect("mongodb://localhost/exercise", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
