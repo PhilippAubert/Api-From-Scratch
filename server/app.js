@@ -121,6 +121,22 @@ app.post("/students", (req, res) => {
     });
 });
 
+app.delete("/courses/:coursesId", (req, res) => {
+  const { courseId } = req.params;
+  Course.findByIdAndDelete(courseId).then(() => {
+    res.status(204);
+    res.json("course eleted");
+  });
+});
+
+app.delete("students/:studentsId", (req, res) => {
+  const { studentsId } = req.params;
+  Students.findByIdAndDelete(studentsId).then(() => {
+    res.status(204);
+    res.json("student deleted");
+  });
+});
+
 mongoose.connect("mongodb://localhost/exercise", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
