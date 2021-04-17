@@ -45,8 +45,21 @@ app.get("/course/:courseId", (req, res) => {
     });
 });
 
-app.get("/course/:id/students", (req, res) => {
-  Course.findById(req.params.id)
+app.get("/students", (req, res) => {
+  Students.find()
+    .then((course) => {
+      res.status(200);
+      res.json(course);
+    })
+    .catch((error) => {
+      res.status(500);
+      res.json(error);
+    });
+});
+
+app.get("/students/:studentsId", (req, res) => {
+  const { studentsId } = req.params;
+  Students.findById(studentsId)
     .then((post) => {
       res.status(200);
       res.json(post);
@@ -70,18 +83,6 @@ app.get("/course/:id/students/:id", (req, res) => {
       res.json({
         error: `Internal Server error ${error}`,
       });
-    });
-});
-
-app.get("/students", (req, res) => {
-  Students.find()
-    .then((course) => {
-      res.status(200);
-      res.json(course);
-    })
-    .catch((error) => {
-      res.status(500);
-      res.json(error);
     });
 });
 
